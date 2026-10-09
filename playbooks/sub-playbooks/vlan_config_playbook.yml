@@ -1,1 +1,22 @@
+- name: Configure multiple VLANs
+  hosts: all
+  gather_facts: no
 
+  tasks:
+    - name: Create and name VLANs
+      cisco.ios.ios_config:
+        lines:
+          - "name {{ item.name }}"
+        parents: "vlan {{ item.id }}"
+        save_when: modified
+
+        loop:
+        - { id: 10, name: Management }
+        - { id: 15, name: Wireless }
+        - { id: 20, name: HR }
+        - { id: 30, name: Finance }
+        - { id: 40, name: Executives }
+        - { id: 50, name: Users }
+        - { id: 60, name: Guests }
+        - { id: 70, name: Voice }
+        - { id: 80, name: Servers }
