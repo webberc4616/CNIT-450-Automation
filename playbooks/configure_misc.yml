@@ -1,0 +1,30 @@
+--- 
+- name: Configure misc settings
+  hosts: cisco_devices
+  gather_facts: false
+
+  tasks:
+    - name: Configure hostname
+      cisco.ios.ios_config:
+        lines:
+          - "hostname {{ hostname }}"
+      when: hostname is defined
+
+    - name: Configure OSPF process
+      cisco.ios.ios_config:
+        parents: "router ospf {{ routing.ospf.process_id }}"
+        lines:
+          - "router-id {{ routing.ospf.router_id }}"
+      when:
+        - routing is defined
+        - routing.ospf is defined
+
+    - name: Configure OSPF networks
+      cisco.ios.ios_config:
+        parents: "router ospf {{ routing.ospf.process_id }}"
+        lines:
+          - "network {{ item.network }} {{ item.wildcard }} area {{ item.area }}"
+      loop: "{{ routing.ospf.networks | default([]) }}"
+      when:
+        - routing is defined
+        - routing/ospf is defined
