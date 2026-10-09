@@ -38,6 +38,7 @@ interfaces:
     description: Link to L3S1
     ip: 10.47.80.1
     mask: 255.255.255.252
-  - name: 10
+    
+  - name: lo0
     ip: 10.47.81.1
     mask: 255.255.255.255
