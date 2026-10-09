@@ -1,0 +1,11 @@
+- name: Configure Cisco router and switch interfaces
+  hosts: cisco_devices
+  gather_facts: false
+
+  tasks:
+    - name: Configure interface settings
+      cisco.ios.ios_config:
+        parents: "interface {{ item.name }}"
+        lines: "{{ ['description ' ~ item.description] + (['ip address ' ~ item.ip ~ ' ' ~ item.mask] if item.ip is defined else []) + ['no shutdown'] }}"
+      loop: "{{ interfaces }}"
+      when: interfaces is defined

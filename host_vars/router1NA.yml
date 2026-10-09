@@ -24,3 +24,20 @@ misc_config:
     lines:
       - "network 10.47.209.1 mask 255.255.255.255"
 
+      - network: 10.47.128.0
+        wildcard: 0.0.0.255
+        area: 0
+
+interfaces:
+  - name: GigabitEthernet0/0/0
+    description: Link to ISPS2
+    ip: 10.47.116.6
+    mask: 255.255.255.252
+
+  - name: GigabitEthernet0/0/1
+    description: Link to L3S1
+    ip: 10.47.80.1
+    mask: 255.255.255.252
+  - name: 10
+    ip: 10.47.81.1
+    mask: 255.255.255.255
