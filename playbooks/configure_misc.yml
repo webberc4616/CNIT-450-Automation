@@ -10,21 +10,33 @@
           - "hostname {{ hostname }}"
       when: hostname is defined
 
-    - name: Configure OSPF process
+    - name: Enable IPv4 routing
       cisco.ios.ios_config:
-        parents: "router ospf {{ routing.ospf.process_id }}"
         lines:
-          - "router-id {{ routing.ospf.router_id }}"
-      when:
-        - routing is defined
-        - routing.ospf is defined
+          - "ip routing"
+      when: enable_ip_routing | default(false) | bool
 
-    - name: Configure OSPF networks
+    - name: Enable IPv6 routing
       cisco.ios.ios_config:
-        parents: "router ospf {{ routing.ospf.process_id }}"
         lines:
-          - "network {{ item.network }} {{ item.wildcard }} area {{ item.area }}"
-      loop: "{{ routing.ospf.networks | default([]) }}"
+          - "ipv6 unicast-routing"
+      when: enable_ipv6_routing | default(false) | bool
+
+    - name: Configure misc commands with parent sections
+      cisco.ios.ios_config:
+        parents: "{{ item.parents }}"
+        lines: "{{ item.lines }}"
+      loop: "{{ misc_config | default([]) }}"
+      loop_control:
+        label: "{{ item.description | default(item.lines | join(',')) }}"
       when:
-        - routing is defined
-        - routing/ospf is defined
+        - item.parents is defined
+
+    - name: Configure global misc commands
+      cisco.ios.ios_config:
+        lines: "{{ item.lines }}"
+      loop: "{{ misc_config | default([]) }}"
+      loop_control:
+        label: "{{ item.description | default(item.lines | join(',')) }}"
+      when:
+        - item.parents is not defined
