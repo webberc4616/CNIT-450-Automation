@@ -1,6 +1,6 @@
 - name: Configure multiple VLANs
   hosts: all
-  gather_facts: no
+  gather_facts: false
 
   tasks:
     - name: Create and name VLANs
