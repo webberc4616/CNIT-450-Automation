@@ -1,0 +1,66 @@
+enable_ipv6_routing: true
+ 
+interfaces:
+  - name: GigabitEthernet0/0/0
+    description: "to ISPS3"
+    ip: 10.47.244.6
+    mask: 255.255.255.252
+  - name: GigabitEthernet0/0/1
+    description: "to L3S1"
+    ip: 10.47.208.1
+    mask: 255.255.255.252
+  - name: Loopback0
+    description: "Router-ID / BGP network"
+    ip: 10.47.209.1
+    mask: 255.255.255.255
+ 
+misc_config:
+  - description: "Hostname and routing"
+    lines:
+      - "hostname R1AS"
+      - "ip routing"
+  - description: "Prefix-lists"
+    lines:
+      - "ip prefix-list AS_BLOCK seq 5 permit 10.47.192.0/19 ge 23 le 24"
+      - "ip prefix-list AS_INBOUND seq 5 permit 10.47.128.0/19 le 32"
+      - "ip prefix-list AS_INBOUND seq 10 permit 10.47.64.0/19 le 32"
+      - "ip prefix-list AS_INBOUND seq 15 permit 0.0.0.0/0"
+  - description: "Route-map EIGRP-BGP"
+    parents: ["route-map EIGRP-BGP permit 10"]
+    lines:
+      - "match ip address prefix-list AS_BLOCK"
+  - description: "Route-map BGP-EIGRP"
+    parents: ["route-map BGP-EIGRP permit 10"]
+    lines:
+      - "match ip address prefix-list AS_INBOUND"
+      - "set metric 100000 100 255 1 1500"
+  - description: "BGP base"
+    parents: ["router bgp 65515"]
+    lines:
+      - "bgp router-id 10.47.209.1"
+      - "neighbor 10.47.244.5 remote-as 64512"
+  - description: "BGP IPv4 AF"
+    parents: ["router bgp 65515", "address-family ipv4 unicast"]
+    lines:
+      - "neighbor 10.47.244.5 activate"
+      - "network 10.47.209.1 mask 255.255.255.255"
+      - "aggregate-address 10.47.128.0 255.255.224.0 summary-only"
+      - "redistribute eigrp 65515 route-map EIGRP-BGP"
+  - description: "EIGRP AF base"
+    parents: ["router eigrp KevOpsAS", "address-family ipv4 unicast autonomous-system 65515"]
+    lines:
+      - "eigrp router-id 10.47.209.1"
+      - "network 10.47.208.0 0.0.0.3"
+      - "network 10.47.209.1 0.0.0.0"
+  - description: "EIGRP default af-interface passive"
+    parents: ["router eigrp KevOpsAS", "address-family ipv4 unicast autonomous-system 65515", "af-interface default"]
+    lines:
+      - "passive-interface"
+  - description: "EIGRP active interface GigabitEthernet0/0/1"
+    parents: ["router eigrp KevOpsAS", "address-family ipv4 unicast autonomous-system 65515", "af-interface GigabitEthernet0/0/1"]
+    lines:
+      - "no passive-interface"
+  - description: "EIGRP topology base"
+    parents: ["router eigrp KevOpsAS", "address-family ipv4 unicast autonomous-system 65515", "topology base"]
+    lines:
+      - "redistribute bgp 65515 route-map BGP-EIGRP"
