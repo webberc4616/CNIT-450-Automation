@@ -1,5 +1,5 @@
 - name: Configure multiple VLANs
-  hosts: all
+  hosts: switches
   gather_facts: false
 
   tasks:
