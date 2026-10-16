@@ -1,0 +1,212 @@
+---
+enable_ipv6_routing: true
+ 
+interfaces:
+  - name: GigabitEthernet1/0/1
+    description: "to R1NA"
+    ip: 10.47.80.2
+    mask: 255.255.255.252
+  - name: GigabitEthernet1/0/2
+    description: "to L3S2NA"
+    ip: 10.47.80.9
+    mask: 255.255.255.252
+  - name: GigabitEthernet1/0/3
+    description: "TBD_DESCRIPTION (trunk to L2)"
+  - name: GigabitEthernet1/0/4
+    description: "TBD_DESCRIPTION (trunk to L2)"
+  - name: GigabitEthernet1/0/23
+    description: "TBD_DESCRIPTION (trunk)"
+  - name: GigabitEthernet1/0/24
+    description: "NA-Server nic1"
+  - name: Loopback0
+    description: "Router-ID"
+    ip: 10.47.81.3
+    mask: 255.255.255.255
+  - name: Vlan10
+    description: "SVI VLAN 10"
+    ip: 10.47.64.1
+    mask: 255.255.255.0
+  - name: Vlan15
+    description: "SVI VLAN 15"
+    ip: 10.47.65.1
+    mask: 255.255.255.0
+  - name: Vlan20
+    description: "SVI VLAN 20"
+    ip: 10.47.66.1
+    mask: 255.255.254.0
+  - name: Vlan30
+    description: "SVI VLAN 30"
+    ip: 10.47.68.1
+    mask: 255.255.254.0
+  - name: Vlan40
+    description: "SVI VLAN 40"
+    ip: 10.47.70.1
+    mask: 255.255.254.0
+  - name: Vlan50
+    description: "SVI VLAN 50"
+    ip: 10.47.72.1
+    mask: 255.255.254.0
+  - name: Vlan60
+    description: "SVI VLAN 60"
+    ip: 10.47.74.1
+    mask: 255.255.254.0
+  - name: Vlan70
+    description: "SVI VLAN 70"
+    ip: 10.47.76.1
+    mask: 255.255.254.0
+  - name: Vlan80
+    description: "SVI VLAN 80"
+    ip: 10.47.78.1
+    mask: 255.255.254.0
+ 
+misc_config:
+  - description: "Hostname and routing"
+    lines:
+      - "hostname L3S1NA"
+      - "ip routing"
+  - description: "Routed port GigabitEthernet1/0/1"
+    parents: ["interface GigabitEthernet1/0/1"]
+    lines:
+      - "no switchport"
+  - description: "Routed port GigabitEthernet1/0/2"
+    parents: ["interface GigabitEthernet1/0/2"]
+    lines:
+      - "no switchport"
+  - description: "Port GigabitEthernet1/0/3"
+    parents: ["interface GigabitEthernet1/0/3"]
+    lines:
+      - "switchport trunk native vlan 999"
+      - "switchport mode trunk"
+  - description: "Port GigabitEthernet1/0/4"
+    parents: ["interface GigabitEthernet1/0/4"]
+    lines:
+      - "switchport trunk native vlan 999"
+      - "switchport mode trunk"
+  - description: "Port GigabitEthernet1/0/23"
+    parents: ["interface GigabitEthernet1/0/23"]
+    lines:
+      - "switchport trunk native vlan 999"
+      - "switchport mode trunk"
+  - description: "Port GigabitEthernet1/0/24"
+    parents: ["interface GigabitEthernet1/0/24"]
+    lines:
+      - "switchport trunk native vlan 999"
+      - "switchport mode trunk"
+  - description: "HSRP/DHCP relay Vlan10"
+    parents: ["interface Vlan10"]
+    lines:
+      - "standby version 2"
+      - "standby 10 ip 10.47.64.254"
+      - "standby 10 priority 110"
+      - "standby 10 preempt"
+      - "ip helper-address 10.47.78.102"
+      - "ip helper-address 10.47.78.103"
+  - description: "HSRP/DHCP relay Vlan15"
+    parents: ["interface Vlan15"]
+    lines:
+      - "standby version 2"
+      - "standby 15 ip 10.47.65.254"
+      - "standby 15 priority 110"
+      - "standby 15 preempt"
+      - "ip helper-address 10.47.78.102"
+      - "ip helper-address 10.47.78.103"
+  - description: "HSRP/DHCP relay Vlan20"
+    parents: ["interface Vlan20"]
+    lines:
+      - "standby version 2"
+      - "standby 20 ip 10.47.67.254"
+      - "standby 20 priority 110"
+      - "standby 20 preempt"
+      - "ip helper-address 10.47.78.102"
+      - "ip helper-address 10.47.78.103"
+  # CHECK: no ip helper-address on VLAN 30 in L3S1 source (present on L3S2).
+  - description: "HSRP/DHCP relay Vlan30"
+    parents: ["interface Vlan30"]
+    lines:
+      - "standby version 2"
+      - "standby 30 ip 10.47.69.254"
+      - "standby 30 priority 110"
+      - "standby 30 preempt"
+  - description: "HSRP/DHCP relay Vlan40"
+    parents: ["interface Vlan40"]
+    lines:
+      - "standby version 2"
+      - "standby 40 ip 10.47.71.254"
+      - "standby 40 priority 110"
+      - "standby 40 preempt"
+      - "ip helper-address 10.47.78.102"
+      - "ip helper-address 10.47.78.103"
+  - description: "HSRP/DHCP relay Vlan50"
+    parents: ["interface Vlan50"]
+    lines:
+      - "standby version 2"
+      - "standby 50 ip 10.47.73.254"
+      - "standby 50 priority 100"
+      - "standby 50 preempt"
+      - "ip helper-address 10.47.78.102"
+      - "ip helper-address 10.47.78.103"
+  - description: "HSRP/DHCP relay Vlan60"
+    parents: ["interface Vlan60"]
+    lines:
+      - "standby version 2"
+      - "standby 60 ip 10.47.75.254"
+      - "standby 60 priority 100"
+      - "standby 60 preempt"
+      - "ip helper-address 10.47.78.102"
+      - "ip helper-address 10.47.78.103"
+  - description: "HSRP/DHCP relay Vlan70"
+    parents: ["interface Vlan70"]
+    lines:
+      - "standby version 2"
+      - "standby 70 ip 10.47.77.254"
+      - "standby 70 priority 100"
+      - "standby 70 preempt"
+      - "ip helper-address 10.47.78.102"
+      - "ip helper-address 10.47.78.103"
+  - description: "HSRP/DHCP relay Vlan80"
+    parents: ["interface Vlan80"]
+    lines:
+      - "standby version 2"
+      - "standby 80 ip 10.47.79.254"
+      - "standby 80 priority 100"
+      - "standby 80 preempt"
+      - "ip helper-address 10.47.78.102"
+      - "ip helper-address 10.47.78.103"
+  - description: "EIGRP AF base"
+    parents: ["router eigrp KevOpsNA", "address-family ipv4 unicast autonomous-system 65510"]
+    lines:
+      - "eigrp router-id 10.47.81.3"
+      - "network 10.47.64.0 0.0.0.255"
+      - "network 10.47.65.0 0.0.0.255"
+      - "network 10.47.66.0 0.0.1.255"
+      - "network 10.47.68.0 0.0.1.255"
+      - "network 10.47.70.0 0.0.1.255"
+      - "network 10.47.72.0 0.0.1.255"
+      - "network 10.47.74.0 0.0.1.255"
+      - "network 10.47.76.0 0.0.1.255"
+      - "network 10.47.78.0 0.0.1.255"
+      - "network 10.47.80.0 0.0.0.3"
+      - "network 10.47.80.8 0.0.0.3"
+      - "network 10.47.81.3 0.0.0.0"
+  - description: "EIGRP default af-interface passive"
+    parents: ["router eigrp KevOpsNA", "address-family ipv4 unicast autonomous-system 65510", "af-interface default"]
+    lines:
+      - "passive-interface"
+  - description: "EIGRP active interface GigabitEthernet1/0/1"
+    parents: ["router eigrp KevOpsNA", "address-family ipv4 unicast autonomous-system 65510", "af-interface GigabitEthernet1/0/1"]
+    lines:
+      - "no passive-interface"
+      - "summary-address 10.47.64.0 255.255.224.0"
+  - description: "EIGRP active interface GigabitEthernet1/0/2"
+    parents: ["router eigrp KevOpsNA", "address-family ipv4 unicast autonomous-system 65510", "af-interface GigabitEthernet1/0/2"]
+    lines:
+      - "no passive-interface"
+  - description: "EIGRP active interface GigabitEthernet1/0/3"
+    parents: ["router eigrp KevOpsNA", "address-family ipv4 unicast autonomous-system 65510", "af-interface GigabitEthernet1/0/3"]
+    lines:
+      - "no passive-interface"
+      - "summary-address 10.47.64.0 255.255.224.0"
+  - description: "EIGRP IPv6 AF"
+    parents: ["router eigrp KevOpsNA", "address-family ipv6 unicast autonomous-system 65510"]
+    lines:
+      - "eigrp router-id 10.47.81.3"
