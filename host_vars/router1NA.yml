@@ -1,43 +1,70 @@
 ---
 # PLACEHOLDER EXAMPLE FOR FUTURE USE OF PLAYBOOKS
 
-hostname: router1NA
-
-enable_ip_routing: true
 enable_ipv6_routing: true
-
-misc_config:
-  - description: AS inbound prefix list
-    lines:
-      - "ip prefix-list AS_INBOUND seq 5 permit 10.47.64.0/19 le 32"
-  
-  - description: BGP to EIGRP route map
-    parents:
-      - "route-map BGP-EIGRP"
-    lines:
-      - "match ip address prefix-list AS_INBOUND"
-
-  - description: BGP IPv4 address family
-    parents:
-      - "router bgp 65515"
-      - "address-family ipv4 unicast"
-    lines:
-      - "network 10.47.209.1 mask 255.255.255.255"
-
-      - network: 10.47.128.0
-        wildcard: 0.0.0.255
-        area: 0
-
+ 
 interfaces:
   - name: GigabitEthernet0/0/0
-    description: Link to ISPS2
+    description: "to ISPS2"
     ip: 10.47.116.6
     mask: 255.255.255.252
-
   - name: GigabitEthernet0/0/1
-    description: Link to L3S1
+    description: "to L3S1"
     ip: 10.47.80.1
     mask: 255.255.255.252
-  - name: 10
+  - name: Loopback0
+    description: "Router-ID / BGP network"
     ip: 10.47.81.1
     mask: 255.255.255.255
+ 
+misc_config:
+  - description: "Hostname and routing"
+    lines:
+      - "hostname R1NA"
+      - "ip routing"
+  - description: "Prefix-lists"
+    lines:
+      - "ip prefix-list NA_BLOCK seq 5 permit 10.47.64.0/19 ge 23 le 24"
+      - "ip prefix-list NA_INBOUND seq 5 permit 10.47.128.0/19 le 32"
+      - "ip prefix-list NA_INBOUND seq 10 permit 10.47.192.0/19 le 32"
+      - "ip prefix-list NA_INBOUND seq 15 permit 0.0.0.0/0"
+  - description: "Route-map EIGRP-BGP"
+    parents: ["route-map EIGRP-BGP permit 10"]
+    lines:
+      - "match ip address prefix-list NA_BLOCK"
+  - description: "Route-map BGP-EIGRP"
+    parents: ["route-map BGP-EIGRP permit 10"]
+    lines:
+      - "match ip address prefix-list NA_INBOUND"
+      - "set metric 100000 100 255 1 1500"
+  - description: "BGP base"
+    parents: ["router bgp 65510"]
+    lines:
+      - "bgp router-id 10.47.81.1"
+      - "neighbor 10.47.116.5 remote-as 64512"
+  - description: "BGP IPv4 AF"
+    parents: ["router bgp 65510", "address-family ipv4 unicast"]
+    lines:
+      - "neighbor 10.47.116.5 activate"
+      - "network 10.47.81.1 mask 255.255.255.255"
+      - "aggregate-address 10.47.64.0 255.255.224.0 summary-only"
+      - "redistribute eigrp 65510 route-map EIGRP-BGP"
+  - description: "EIGRP AF base"
+    parents: ["router eigrp KevOpsNA", "address-family ipv4 unicast autonomous-system 65510"]
+    lines:
+      - "eigrp router-id 10.47.81.1"
+      - "network 10.47.80.0 0.0.0.3"
+      - "network 10.47.81.1 0.0.0.0"
+  - description: "EIGRP default af-interface passive"
+    parents: ["router eigrp KevOpsNA", "address-family ipv4 unicast autonomous-system 65510", "af-interface default"]
+    lines:
+      - "passive-interface"
+  - description: "EIGRP active interface GigabitEthernet0/0/1"
+    parents: ["router eigrp KevOpsNA", "address-family ipv4 unicast autonomous-system 65510", "af-interface GigabitEthernet0/0/1"]
+    lines:
+      - "no passive-interface"
+  - description: "EIGRP topology base"
+    parents: ["router eigrp KevOpsNA", "address-family ipv4 unicast autonomous-system 65510", "topology base"]
+    lines:
+      - "redistribute bgp 65510 route-map BGP-EIGRP"
+
