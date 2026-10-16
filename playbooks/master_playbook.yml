@@ -1,1 +1,10 @@
+---
 
+- name: Step 1 - Configure VLANs on Switches
+  import_playbook: vlan_config_playbook.yml
+
+- name: Import Interfaces Configuration PLAYBOOKS
+  import_playbook: configure_interfaces.yml
+
+- name: Import Misc Configure PLAYBOOKS
+  import_playbook: configure.misc.yml
