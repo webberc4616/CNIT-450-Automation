@@ -1,3 +1,4 @@
+---
 enable_ipv6_routing: true
  
 interfaces:
