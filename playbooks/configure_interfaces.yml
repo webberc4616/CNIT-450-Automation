@@ -9,3 +9,15 @@
         lines: "{{ ['description ' ~ item.description] + (['ip address ' ~ item.ip ~ ' ' ~ item.mask] if item.ip is defined else []) + ['no shutdown'] }}"
       loop: "{{ interfaces }}"
       when: interfaces is defined
+
+    - name: Configure GRE tunnel settings
+      cisco.ios.ios_config:
+        parents: "interface {{ item.name }}"
+        lines:
+          - "tunnel source {{ item.tunnel_source }}"
+          - "tunnel destination {{ item.tunnel_destination }}"
+          - "tunnel protection ipsec profile {{ item.tunnel_protection }}"
+      loop: "{{ interfaces }}"
+      when:
+        - interfaces is defined
+        - item.name is match('^Tunnel[0-9]+$')

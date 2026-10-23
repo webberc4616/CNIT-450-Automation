@@ -1,0 +1,64 @@
+enable_ipv6_routing: true
+ 
+interfaces:
+  - name: GigabitEthernet0/0/0
+    description: "to R5NA"
+    ip: 10.47.112.17
+    mask: 255.255.255.252
+  - name: GigabitEthernet0/0/1
+    description: "to NAL3S2"
+    ip: 10.47.80.14
+    mask: 255.255.255.252
+  - name: Tunnel0
+    ip: 10.47.144.1
+    mask: 255.255.255.252
+    tunnel_source: GigabitEthernet0/0/0
+    tunnel_destination: 10.47.112.18
+    tunnel_protection: ipsec profile GRE-IPSEC-PROFILE
+ 
+misc_config:
+  - description: "Hostname and routing"
+    lines:
+      - "hostname R4NA"
+      - "ip routing"
+  - description: "Configure ISAKMP policy"
+    parents: ["crypto isakmp policy 10"]
+    lines:
+      - " encr aes"
+      - " hash sha256"
+      - " authentication pre-share"
+      - " group 14"
+  - description: "Configure IPsec transform set"
+    parents: ["crypto ipsec transform-set GRE-IPSEC esp-aes esp-sha256-hmac"]
+    lines:
+      - " mode transport"
+  - description: "Configure IPsec profile"
+    parents: ["crypto ipsec profile GRE-IPSEC-PROFILE"]
+    lines:
+      - " set transform-set GRE-IPSEC"
+  - description: "Confgiure ISAKMP pre shared key"
+    lines:
+      - "crypto isakmp key kevtechops address 10.47.112.18"
+  - description: "EIGRP AF base"
+    parents: ["router eigrp KevOpsAS", "address-family ipv4 unicast autonomous-system 65510"]
+    lines:
+      - "eigrp router-id 10.47.81.5"
+      - "network 10.47.80.12 0.0.0.3"
+      - "network 10.47.112.16 0.0.0.3"
+      - "network 10.47.81.5 0.0.0.0"
+  - description: "EIGRP default af-interface passive"
+    parents: ["router eigrp KevOpsAS", "address-family ipv4 unicast autonomous-system 65510", "af-interface default"]
+    lines:
+      - "passive-interface"
+  - description: "EIGRP active interface GigabitEthernet0/0/1"
+    parents: ["router eigrp KevOpsAS", "address-family ipv4 unicast autonomous-system 65510", "af-interface GigabitEthernet0/0/1"]
+    lines:
+      - "no passive-interface"
+  - description: "EIGRP active interface GigabitEthernet0/0/0"
+    parents: ["router eigrp KevOpsAS", "address-family ipv4 unicast autonomous-system 65510", "af-interface GigabitEthernet0/0/0"]
+    lines:
+      - "no passive-interface"
+  - description: "EIGRP active interface Tunnel0"
+    parents: ["router eigrp KevOpsAS", "address-family ipv4 unicast autonomous-system 65510", "af-interface Tunnel0"]
+    lines:
+      - "no passive-interface"

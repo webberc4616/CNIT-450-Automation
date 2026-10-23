@@ -9,49 +9,42 @@ interfaces:
     description: "to ASL3S2"
     ip: 10.47.208.14
     mask: 255.255.255.252
-  - name: Loopback0
-    description: "Router-ID / BGP network"
-    ip: 10.47.209.2
-    mask: 255.255.255.255
+  - name: Tunnel0
+    ip: 10.47.242.1
+    mask: 255.255.255.252
+    tunnel_source: GigabitEthernet0/0/0
+    tunnel_destination: 10.47.208.18
+    tunnel_protection: ipsec profile GRE-IPSEC-PROFILE
  
 misc_config:
   - description: "Hostname and routing"
     lines:
       - "hostname R4AS"
       - "ip routing"
-  - description: "Prefix-lists"
+  - description: "Configure ISAKMP policy"
+    parents: ["crypto isakmp policy 10"]
     lines:
-      - "ip prefix-list AS_BLOCK seq 5 permit 10.47.192.0/19 ge 23 le 24"
-      - "ip prefix-list AS_INBOUND seq 5 permit 10.47.64.0/19 le 32"
-      - "ip prefix-list AS_INBOUND seq 10 permit 10.47.128.0/19 le 32"
-      - "ip prefix-list AS_INBOUND seq 15 permit 0.0.0.0/0"
-  - description: "Route-map EIGRP-BGP"
-    parents: ["route-map EIGRP-BGP permit 10"]
+      - " encr aes"
+      - " hash sha256"
+      - " authentication pre-share"
+      - " group 14"
+  - description: "Configure IPsec transform set"
+    parents: ["crypto ipsec transform-set GRE-IPSEC esp-aes esp-sha256-hmac"]
     lines:
-      - "match ip address prefix-list AS_BLOCK"
-  - description: "Route-map BGP-EIGRP"
-    parents: ["route-map BGP-EIGRP permit 10"]
+      - " mode transport"
+  - description: "Configure IPsec profile"
+    parents: ["crypto ipsec profile GRE-IPSEC-PROFILE"]
     lines:
-      - "match ip address prefix-list AS_INBOUND"
-      - "set metric 100000 100 255 1 1500"
-  - description: "BGP base"
-    parents: ["router bgp 65515"]
+      - " set transform-set GRE-IPSEC"
+  - description: "Confgiure ISAKMP pre shared key"
     lines:
-      - "bgp router-id 10.47.209.2"
-      - "neighbor 10.47.244.1 remote-as 64512"
-  - description: "BGP IPv4 AF"
-    parents: ["router bgp 65515", "address-family ipv4 unicast"]
-    lines:
-      - "neighbor 10.47.244.1 activate"
-      - "network 10.47.209.2 mask 255.255.255.255"
-      - "aggregate-address 10.47.192.0 255.255.224.0 summary-only"
-      - "redistribute eigrp 65515 route-map EIGRP-BGP"
+      - "crypto isakmp key kevtechops address 10.47.240.18"
   - description: "EIGRP AF base"
     parents: ["router eigrp KevOpsAS", "address-family ipv4 unicast autonomous-system 65515"]
     lines:
-      - "eigrp router-id 10.47.209.2"
-      - "network 10.47.208.4 0.0.0.3"
-      - "network 10.47.209.2 0.0.0.0"
+      - "eigrp router-id 10.47.209.5"
+      - "network 10.47.208.12 0.0.0.3"
+      - "network 10.47.240.16 0.0.0.3"
   - description: "EIGRP default af-interface passive"
     parents: ["router eigrp KevOpsAS", "address-family ipv4 unicast autonomous-system 65515", "af-interface default"]
     lines:
@@ -60,7 +53,11 @@ misc_config:
     parents: ["router eigrp KevOpsAS", "address-family ipv4 unicast autonomous-system 65515", "af-interface GigabitEthernet0/0/1"]
     lines:
       - "no passive-interface"
-  - description: "EIGRP topology base"
-    parents: ["router eigrp KevOpsAS", "address-family ipv4 unicast autonomous-system 65515", "topology base"]
+  - description: "EIGRP active interface GigabitEthernet0/0/0"
+    parents: ["router eigrp KevOpsAS", "address-family ipv4 unicast autonomous-system 65515", "af-interface GigabitEthernet0/0/0"]
     lines:
-      - "redistribute bgp 65515 route-map BGP-EIGRP"
+      - "no passive-interface"
+  - description: "EIGRP active interface Tunnel0"
+    parents: ["router eigrp KevOpsAS", "address-family ipv4 unicast autonomous-system 65515", "af-interface Tunnel0"]
+    lines:
+      - "no passive-interface"
