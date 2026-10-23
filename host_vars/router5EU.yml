@@ -1,0 +1,107 @@
+enable_ipv6_routing: true
+ 
+interfaces:
+  - name: GigabitEthernet0/0/0
+    description: "to R4EU"
+    ip: 10.47.176.18
+    mask: 255.255.255.252
+  - name: Tunnel0
+    ip: 10.47.178.2
+    mask: 255.255.255.252
+    tunnel_source: GigabitEthernet0/0/0
+    tunnel_destination: 10.47.176.17
+    tunnel_protection: ipsec profile GRE-IPSEC-PROFILE
+  - name: GigabitEthernet0/1.10
+    description: "VLAN 10 subinterface"
+    ip: 10.47.160.1
+    mask: 255.255.254.0
+    vlan: 10
+  - name: GigabitEthernet0/1.20
+    description: "VLAN 20 subinterface"
+    ip: 10.47.162.1
+    mask: 255.255.254.0
+    vlan: 20
+  - name: GigabitEthernet0/1.30
+    description: "VLAN 30 subinterface"
+    ip: 10.47.164.1
+    mask: 255.255.254.0
+    vlan: 30
+  - name: GigabitEthernet0/1.40
+    description: "VLAN 40 subinterface"
+    ip: 10.47.166.1 
+    mask: 255.255.254.0
+    vlan: 40
+  - name: GigabitEthernet0/1.50
+    description: "VLAN 50 subinterface"
+    ip: 10.47.168.1
+    mask: 255.255.254.0
+    vlan: 50
+  - name: GigabitEthernet0/1.60
+    description: "VLAN 60 subinterface"
+    ip: 10.47.170.1
+    mask: 255.255.254.0
+    vlan: 60
+  - name: GigabitEthernet0/1.70
+    description: "VLAN 70 subinterface"
+    ip: 10.47.172.1
+    mask: 255.255.254.0
+    vlan: 70
+  - name: GigabitEthernet0/1.80
+    description: "VLAN 80 subinterface"
+    ip: 10.47.174.1
+    mask: 255.255.254.0
+    vlan: 80
+  - name: lo0
+    description: "Loopback interface"
+    ip: 10.47.145.6
+    mask: 255.255.255.255
+ 
+misc_config:
+  - description: "Hostname and routing"
+    lines:
+      - "hostname R5EU"
+      - "ip routing"
+  - description: "Configure ISAKMP policy"
+    parents: ["crypto isakmp policy 10"]
+    lines:
+      - " encr aes"
+      - " hash sha256"
+      - " authentication pre-share"
+      - " group 14"
+  - description: "Configure IPsec transform set"
+    parents: ["crypto ipsec transform-set GRE-IPSEC esp-aes esp-sha256-hmac"]
+    lines:
+      - " mode transport"
+  - description: "Configure IPsec profile"
+    parents: ["crypto ipsec profile GRE-IPSEC-PROFILE"]
+    lines:
+      - " set transform-set GRE-IPSEC"
+  - description: "Confgiure ISAKMP pre shared key"
+    lines:
+      - "crypto isakmp key kevtechops address 10.47.176.17"
+  - description: "EIGRP AF base"
+    parents: ["router eigrp KevOpsAS", "address-family ipv4 unicast autonomous-system 65512"]
+    lines:
+      - "eigrp router-id 10.47.145.6"
+      - "network 10.47.160.0 0.0.0.3"
+      - "network 10.47.162.0 0.0.0.3"
+      - "network 10.47.164.0 0.0.0.3"
+      - "network 10.47.166.0 0.0.0.3"
+      - "network 10.47.168.0 0.0.0.3"
+      - "network 10.47.170.0 0.0.0.3"
+      - "network 10.47.172.0 0.0.0.3"
+      - "network 10.47.174.0 0.0.0.3"
+      - "network 10.47.176.16 0.0.0.3"
+      - "network 10.47.145.6 0.0.0.0"
+  - description: "EIGRP default af-interface passive"
+    parents: ["router eigrp KevOpsAS", "address-family ipv4 unicast autonomous-system 65512", "af-interface default"]
+    lines:
+      - "passive-interface"
+  - description: "EIGRP active interface GigabitEthernet0/0/0"
+    parents: ["router eigrp KevOpsAS", "address-family ipv4 unicast autonomous-system 65512", "af-interface GigabitEthernet0/0/0"]
+    lines:
+      - "no passive-interface"
+  - description: "EIGRP active interface Tunnel0"
+    parents: ["router eigrp KevOpsAS", "address-family ipv4 unicast autonomous-system 65512", "af-interface Tunnel0"]
+    lines:
+      - "no passive-interface"

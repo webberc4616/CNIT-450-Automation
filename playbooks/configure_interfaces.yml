@@ -21,3 +21,12 @@
       when:
         - interfaces is defined
         - item.name is match('^Tunnel[0-9]+$')
+    - name: Configure subinterface encapsulation
+      cisco.ios.ios_config:
+        parents: "interface {{ item.name }}"
+        lines:
+          - "encapsulation dot1Q {{ item.vlan }}"
+      loop: "{{ interfaces }}"
+      when:
+        - interfaces is defined
+        - item.vlan is defined
