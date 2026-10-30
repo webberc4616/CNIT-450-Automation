@@ -63,10 +63,13 @@ misc_config:
   - description: "Confgiure ISAKMP pre shared key"
     lines:
       - "crypto isakmp key kevtechops address 10.47.240.17"
+  - description: "EIGRP base"
+    parents: ["router eigrp KevOpsAS"]
+    lines:
+      - "eigrp router-id 10.47.209.6"
   - description: "EIGRP AF base"
     parents: ["router eigrp KevOpsAS", "address-family ipv4 unicast autonomous-system 65515"]
     lines:
-      - "eigrp router-id 10.47.209.6"
       - "network 10.47.240.16 0.0.0.3"
       - "network 10.47.242.0 0.0.0.3"
       - "network 10.47.224.0 0.0.0.31"

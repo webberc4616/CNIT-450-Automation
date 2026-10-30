@@ -1,5 +1,4 @@
 ---
-# PLACEHOLDER EXAMPLE FOR FUTURE USE OF PLAYBOOKS
 
 enable_ipv6_routing: true
  
@@ -13,7 +12,6 @@ interfaces:
     ip: 10.47.80.1
     mask: 255.255.255.252
   - name: Loopback0
-    description: "Router-ID / BGP network"
     ip: 10.47.81.1
     mask: 255.255.255.255
  
@@ -24,16 +22,19 @@ misc_config:
       - "ip routing"
   - description: "Prefix-lists"
     lines:
-      - "ip prefix-list NA_BLOCK seq 5 permit 10.47.64.0/19 ge 23 le 24"
+      - "ip prefix-list NA_BLOCK seq 5 permit 10.47.64.0/19"
+      - "ip prefix-list NA_BLOCK seq 10 permit 10.47.96.0/19"
       - "ip prefix-list NA_INBOUND seq 5 permit 10.47.128.0/19 le 32"
-      - "ip prefix-list NA_INBOUND seq 10 permit 10.47.192.0/19 le 32"
-      - "ip prefix-list NA_INBOUND seq 15 permit 0.0.0.0/0"
+      - "ip prefix-list NA_INBOUND seq 10 permit 10.47.160.0/19 le 32"
+      - "ip prefix-list NA_INBOUND seq 15 permit 10.47.192.0/19 le 32"
+      - "ip prefix-list NA_INBOUND seq 20 permit 10.47.224.0/19 le 32"
+      - "ip prefix-list NA_INBOUND seq 25 permit 0.0.0.0/0"
   - description: "Route-map EIGRP-BGP"
-    parents: ["route-map EIGRP-BGP permit 10"]
+    parents: ["route-map EIGRP-BGP"]
     lines:
       - "match ip address prefix-list NA_BLOCK"
   - description: "Route-map BGP-EIGRP"
-    parents: ["route-map BGP-EIGRP permit 10"]
+    parents: ["route-map BGP-EIGRP"]
     lines:
       - "match ip address prefix-list NA_INBOUND"
       - "set metric 100000 100 255 1 1500"
@@ -47,12 +48,14 @@ misc_config:
     lines:
       - "neighbor 10.47.116.5 activate"
       - "network 10.47.81.1 mask 255.255.255.255"
-      - "aggregate-address 10.47.64.0 255.255.224.0 summary-only"
       - "redistribute eigrp 65510 route-map EIGRP-BGP"
+  - description: "EIGRP base"
+    parents: ["router eigrp KevOpsAS"]
+    lines:
+      - "eigrp router-id 10.47.81.1"
   - description: "EIGRP AF base"
     parents: ["router eigrp KevOpsNA", "address-family ipv4 unicast autonomous-system 65510"]
     lines:
-      - "eigrp router-id 10.47.81.1"
       - "network 10.47.80.0 0.0.0.3"
       - "network 10.47.81.1 0.0.0.0"
   - description: "EIGRP default af-interface passive"
@@ -67,4 +70,6 @@ misc_config:
     parents: ["router eigrp KevOpsNA", "address-family ipv4 unicast autonomous-system 65510", "topology base"]
     lines:
       - "redistribute bgp 65510 route-map BGP-EIGRP"
-
+  - description: "Configure SNMP community"
+    lines:
+      - "snmp-server community KEVTECHOPS69NAZBX RO"

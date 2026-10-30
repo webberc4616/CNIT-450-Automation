@@ -48,10 +48,13 @@ misc_config:
       - "neighbor 10.47.244.5 activate"
       - "network 10.47.209.1 mask 255.255.255.255"
       - "redistribute eigrp 65515 route-map EIGRP-BGP"
+  - description: "EIGRP base"
+    parents: ["router eigrp KevOpsAS"]
+    lines:
+      - "eigrp router-id 10.47.209.1"
   - description: "EIGRP AF base"
     parents: ["router eigrp KevOpsAS", "address-family ipv4 unicast autonomous-system 65515"]
     lines:
-      - "eigrp router-id 10.47.209.1"
       - "network 10.47.208.0 0.0.0.3"
       - "network 10.47.209.1 0.0.0.0"
   - description: "EIGRP default af-interface passive"

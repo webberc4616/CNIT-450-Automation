@@ -6,7 +6,7 @@ interfaces:
     ip: 10.47.112.17
     mask: 255.255.255.252
   - name: GigabitEthernet0/0/1
-    description: "to NAL3S2"
+    description: "to NAL3SW2"
     ip: 10.47.80.14
     mask: 255.255.255.252
   - name: Tunnel0
@@ -15,7 +15,10 @@ interfaces:
     tunnel_source: GigabitEthernet0/0/0
     tunnel_destination: 10.47.112.18
     tunnel_protection: ipsec profile GRE-IPSEC-PROFILE
- 
+  - name: Loopback0
+    ip: 10.47.81.5
+    mask: 255.255.255.255
+
 misc_config:
   - description: "Hostname and routing"
     lines:
@@ -36,16 +39,20 @@ misc_config:
     parents: ["crypto ipsec profile GRE-IPSEC-PROFILE"]
     lines:
       - " set transform-set GRE-IPSEC"
-  - description: "Confgiure ISAKMP pre shared key"
+  - description: "Configure ISAKMP pre shared key"
     lines:
       - "crypto isakmp key kevtechops address 10.47.112.18"
+  - description: "EIGRP base"
+    parents: ["router eigrp KevOpsAS"]
+    lines:
+      - "eigrp router-id 10.47.81.5"
   - description: "EIGRP AF base"
     parents: ["router eigrp KevOpsAS", "address-family ipv4 unicast autonomous-system 65510"]
     lines:
-      - "eigrp router-id 10.47.81.5"
       - "network 10.47.80.12 0.0.0.3"
       - "network 10.47.112.16 0.0.0.3"
       - "network 10.47.81.5 0.0.0.0"
+      - "network 10.47.114.0 0.0.0.3"
   - description: "EIGRP default af-interface passive"
     parents: ["router eigrp KevOpsAS", "address-family ipv4 unicast autonomous-system 65510", "af-interface default"]
     lines:
@@ -62,3 +69,6 @@ misc_config:
     parents: ["router eigrp KevOpsAS", "address-family ipv4 unicast autonomous-system 65510", "af-interface Tunnel0"]
     lines:
       - "no passive-interface"
+  - description: "Configure SNMP community"
+    lines:
+      - "snmp-server community KEVTECHOPS69NAZBX RO"
