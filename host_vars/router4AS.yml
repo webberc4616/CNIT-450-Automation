@@ -3,10 +3,10 @@ enable_ipv6_routing: true
 interfaces:
   - name: GigabitEthernet0/0/0
     description: "to R5AS"
-    ip: 10.47.240.1
+    ip: 10.47.240.17
     mask: 255.255.255.252
   - name: GigabitEthernet0/0/1
-    description: "to ASL3S2"
+    description: "to L3S2AS"
     ip: 10.47.208.14
     mask: 255.255.255.252
   - name: Tunnel0
@@ -45,6 +45,7 @@ misc_config:
       - "eigrp router-id 10.47.209.5"
       - "network 10.47.208.12 0.0.0.3"
       - "network 10.47.240.16 0.0.0.3"
+      - "network 10.47.242.0 0.0.0.3"
   - description: "EIGRP default af-interface passive"
     parents: ["router eigrp KevOpsAS", "address-family ipv4 unicast autonomous-system 65515", "af-interface default"]
     lines:
@@ -53,6 +54,7 @@ misc_config:
     parents: ["router eigrp KevOpsAS", "address-family ipv4 unicast autonomous-system 65515", "af-interface GigabitEthernet0/0/1"]
     lines:
       - "no passive-interface"
+      - "summary-address 10.47.224.0 255.255.224.0"
   - description: "EIGRP active interface GigabitEthernet0/0/0"
     parents: ["router eigrp KevOpsAS", "address-family ipv4 unicast autonomous-system 65515", "af-interface GigabitEthernet0/0/0"]
     lines:
@@ -61,3 +63,6 @@ misc_config:
     parents: ["router eigrp KevOpsAS", "address-family ipv4 unicast autonomous-system 65515", "af-interface Tunnel0"]
     lines:
       - "no passive-interface"
+  - description: "Configure SNMP community"
+    lines:
+      - "snmp-server community KEVTECHOPS69ASZBX RO"

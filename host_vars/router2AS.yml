@@ -25,6 +25,7 @@ misc_config:
       - "multilink bundle-name authenticated"
       - "diagnostic bootup level minimal"
       - "spanning-tree extend system-id"
+      - "ip routing"
 
   - description: "Management VRF"
     parents:
@@ -145,10 +146,13 @@ misc_config:
   - description: "Prefix-lists"
     lines:
       - "ip prefix-list AS_BLOCK seq 5 permit 10.47.192.0/19 ge 23 le 24"
+      - "ip prefix-list AS_BLOCK seq 10 permit 10.47.224.0/19"
       - "ip prefix-list AS_INBOUND seq 5 permit 10.47.64.0/19 le 32"
       - "ip prefix-list AS_INBOUND seq 10 permit 10.47.128.0/19 le 32"
       - "ip prefix-list AS_INBOUND seq 15 permit 0.0.0.0/0"
-
+      - "ip prefix-list AS_INBOUND seq 20 permit 10.47.96.0/19 ge 23 le 24"
+      - "ip prefix-list AS_INBOUND seq 25 permit 10.47.160.0/19 ge 23"
+  
   - description: "Route-map EIGRP-BGP"
     parents:
       - "route-map EIGRP-BGP permit 10"
@@ -180,3 +184,6 @@ misc_config:
       - "line vty 0 4"
     lines:
       - "login"
+  - description: "Configure SNMP community"
+    lines:
+      - "snmp-server community KEVTECHOPS69ASZBX RO"

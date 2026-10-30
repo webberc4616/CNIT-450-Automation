@@ -7,11 +7,10 @@ interfaces:
     ip: 10.47.244.6
     mask: 255.255.255.252
   - name: GigabitEthernet0/0/1
-    description: "to L3S1"
+    description: "to ASL3SW1"
     ip: 10.47.208.1
     mask: 255.255.255.252
   - name: Loopback0
-    description: "Router-ID / BGP network"
     ip: 10.47.209.1
     mask: 255.255.255.255
  
@@ -22,10 +21,13 @@ misc_config:
       - "ip routing"
   - description: "Prefix-lists"
     lines:
-      - "ip prefix-list AS_BLOCK seq 5 permit 10.47.192.0/19 ge 23 le 24"
-      - "ip prefix-list AS_INBOUND seq 5 permit 10.47.128.0/19 le 32"
-      - "ip prefix-list AS_INBOUND seq 10 permit 10.47.64.0/19 le 32"
+      - "ip prefix-list AS_BLOCK seq 5 permit 10.47.192.0/19"
+      - "ip prefix-list AS_BLOCK seq 10 permit 10.47.224.0/19"
+      - "ip prefix-list AS_INBOUND seq 5 permit 10.47.64.0/19 le 32"
+      - "ip prefix-list AS_INBOUND seq 10 permit 10.47.128.0/19 le 32"
       - "ip prefix-list AS_INBOUND seq 15 permit 0.0.0.0/0"
+      - "ip prefix-list AS_INBOUND seq 20 permit 10.47.96.0/19 ge 23 le 24"
+      - "ip prefix-list AS_INBOUND seq 25 permit 10.47.160.0/19 ge 23 le 24"
   - description: "Route-map EIGRP-BGP"
     parents: ["route-map EIGRP-BGP permit 10"]
     lines:
@@ -45,7 +47,6 @@ misc_config:
     lines:
       - "neighbor 10.47.244.5 activate"
       - "network 10.47.209.1 mask 255.255.255.255"
-      - "aggregate-address 10.47.128.0 255.255.224.0 summary-only"
       - "redistribute eigrp 65515 route-map EIGRP-BGP"
   - description: "EIGRP AF base"
     parents: ["router eigrp KevOpsAS", "address-family ipv4 unicast autonomous-system 65515"]
@@ -65,3 +66,6 @@ misc_config:
     parents: ["router eigrp KevOpsAS", "address-family ipv4 unicast autonomous-system 65515", "topology base"]
     lines:
       - "redistribute bgp 65515 route-map BGP-EIGRP"
+  - description: "Configure SNMP community"
+    lines:
+      - "snmp-server community KEVTECHOPS69ASZBX RO"
