@@ -1,0 +1,67 @@
+---
+interfaces:
+  - name: Port-channel1
+    mode: trunk
+    native_vlan: 999
+  - name: FastEthernet0/1
+    mode: trunk
+    native_vlan: 999
+    channel_group: 1
+    channel_mode: active
+  - name: FastEthernet0/2
+    mode: trunk
+    native_vlan: 999
+    channel_group: 1
+    channel_mode: active
+  - name: Vlan10
+    description: "Management VLAN"
+    ip: 10.47.128.5
+    mask: 255.255.255.0
+
+misc_config:
+  - description: "Configure default gateway"
+    lines:
+      - "ip default-gateway 10.47.128.254"
+  - description: "VLANS"
+    lines:
+      - "vlan 10"
+      - "name Management"
+      - "vlan 15"
+      - "name Wireless"
+      - "vlan 20"
+      - "name HR"
+      - "vlan 30"
+      - "name Finance"
+      - "vlan 40"
+      - "name Executives"
+      - "vlan 50"
+      - "name Users"
+      - "vlan 60"
+      - "name Guests"
+      - "vlan 70"
+      - "name Voice"
+      - "vlan 80"
+      - "name Servers"
+      - "vlan 999"
+  - description: "Hostname and routing"
+    lines:
+      - "hostname L2S3EU"
+      - "ip routing"
+  - description: "Configure SSH and local authentication"
+    lines:
+        - "ip domain-name kevtechops.net"
+        - "username admin privilege 15 secret 'Pa$$w0rd'"
+        - "crypto key generate rsa modulus 2048"
+        - "ip ssh version 2"
+  - description: "Configure VTY lines for SSH"
+    parents: ["line vty 0 15"]
+    lines:
+        - "transport input ssh"
+        - "login local"
+  - description: "Configure console login"
+    parents: ["line con 0"]
+    lines:
+        - "login local"
+  - description: "Configure SNMP community"
+    lines:
+      - "snmp-server community KEVTECHOPS69EUZBX RO"
