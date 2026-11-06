@@ -1,0 +1,9 @@
+---
+interfaces:
+  - name: GigabitEthernet1/0/1
+    mode: trunk
+
+misc_config:
+  - description: "Configure SNMP community"
+    lines:
+      - "snmp-server community KEVTECHOPS69ASZBX RO"

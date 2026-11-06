@@ -1,0 +1,178 @@
+---
+interfaces:
+  - name: GigabitEthernet1/0/1
+    description: "to ASR2"
+    no_switchport: true
+    ip: 10.47.208.6
+    mask: 255.255.255.252
+  - name: GigabitEthernet1/0/2
+    description: "to ASL3SW1"
+    ip: 10.47.208.10
+    mask: 255.255.255.252
+    no_switchport: true
+  - name: GigabitEthernet1/0/3
+    description: "to ASR4"
+    no_switchport: true
+    ip: 10.47.208.13
+    mask: 255.255.255.252
+  - name: GigabitEthernet1/0/4
+    description: "to ASL2SW2"
+    mode: trunk
+    native_vlan: 999
+  - name: GigabitEthernet1/0/5
+    description: "to ASL2SW1"
+    mode: trunk
+    native_vlan: 999
+  - name: Vlan10
+    description: "Management VLAN"
+    ip: 10.47.192.2
+    mask: 255.255.255.0
+    hsrp: 
+      version: 2
+      group: 10
+      virtual_ip: 10.47.192.254
+      preempt: true
+  - name: Vlan15
+    description: "Wireless VLAN"
+    ip: 10.47.193.2
+    mask: 255.255.255.0
+    hsrp:
+      version: 2
+      group: 15
+      virtual_ip: 10.47.193.254
+      preempt: true
+  - name: Vlan20
+    description: "HR"
+    ip: 10.47.194.2
+    mask: 255.255.254.0
+    hsrp:
+      version: 2
+      group: 20
+      virtual_ip: 10.47.195.254
+      preempt: true
+  - name: Vlan30
+    description: "Finance"
+    ip: 10.47.196.2
+    mask: 255.255.254.0
+    hsrp:
+      version: 2
+      group: 30
+      virtual_ip: 10.47.197.254
+      preempt: true
+  - name: Vlan40
+    description: "Executives"
+    ip: 10.47.198.2
+    mask: 255.255.254.0
+    hsrp:
+      version: 2
+      group: 40
+      virtual_ip: 10.47.199.254
+      preempt: true
+  - name: Vlan50
+    description: "Users"
+    ip: 10.47.200.2
+    mask: 255.255.254.0
+    hsrp:
+      version: 2
+      group: 50
+      virtual_ip: 10.47.201.254
+      priority: 110
+      preempt: true
+  - name: Vlan60
+    description: "Guests"
+    ip: 10.47.202.2
+    mask: 255.255.254.0
+    hsrp:
+      version: 2
+      group: 60
+      virtual_ip: 10.47.203.254
+      priority: 110
+      preempt: true
+  - name: Vlan70
+    description: "Voice"
+    ip: 10.47.204.2
+    mask: 255.255.254.0
+    hsrp:
+      version: 2
+      group: 70
+      priority: 110
+      virtual_ip: 10.47.205.254
+      preempt: true
+  - name: Vlan80
+    description: "Servers"
+    ip: 10.47.206.1
+    mask: 255.255.254.0
+    hsrp:
+      version: 2
+      group: 80
+      priority: 110
+      virtual_ip: 10.47.207.254
+      preempt: true
+  - name: Lo0
+    description: "Loopback Interface"
+    ip: 10.47.209.4
+    mask: 255.255.255.255
+
+misc_config:
+  - description: "VLANS"
+    lines:
+      - "vlan 10"
+      - "name Management"
+      - "vlan 15"
+      - "name Wireless"
+      - "vlan 20"
+      - "name HR"
+      - "vlan 30"
+      - "name Finance"
+      - "vlan 40"
+      - "name Executives"
+      - "vlan 50"
+      - "name Users"
+      - "vlan 60"
+      - "name Guests"
+      - "vlan 70"
+      - "name Voice"
+      - "vlan 80"
+      - "name Servers"
+  
+
+  - description: "Hostname and routing"
+    lines:
+      - "hostname L3S2AS"
+      - "ip routing"
+  - description: "EIGRP AF base"
+    parents: ["router eigrp KevOpsAS", "address-family ipv4 unicast autonomous-system 65515"]
+    lines:
+      - "network 10.47.192.0 0.0.0.255"
+      - "network 10.47.193.0 0.0.0.255"
+      - "network 10.47.194.0 0.0.1.255"
+      - "network 10.47.196.0 0.0.1.255"
+      - "network 10.47.198.0 0.0.1.255"
+      - "network 10.47.200.0 0.0.1.255"
+      - "network 10.47.202.0 0.0.1.255"
+      - "network 10.47.204.0 0.0.1.255"
+      - "network 10.47.206.0 0.0.1.255"
+      - "network 10.47.208.0 0.0.0.3"
+      - "network 10.47.208.4 0.0.0.0"
+      - "network 10.47.208.8 0.0.0.3"
+      - "network 10.47.208.12 0.0.0.0"
+  - description: "EIGRP default af-interface passive"
+    parents: ["router eigrp KevOpsAS", "address-family ipv4 unicast autonomous-system 65515", "af-interface default"]
+    lines:
+      - "passive-interface"
+  - description: "EIGRP active interface GigabitEthernet1/0/1"
+    parents: ["router eigrp KevOpsAS", "address-family ipv4 unicast autonomous-system 65515", "af-interface GigabitEthernet1/0/1"]
+    lines:
+      - "summary-address 10.47.192.0 255.255.224.0"
+      - "no passive-interface"
+  - description: "EIGRP active interface GigabitEthernet1/0/2"
+    parents: ["router eigrp KevOpsAS", "address-family ipv4 unicast autonomous-system 65515", "af-interface GigabitEthernet1/0/2"]
+    lines:
+      - "no passive-interface"
+  - description: "EIGRP active interface GigabitEthernet1/0/3"
+    parents: ["router eigrp KevOpsAS", "address-family ipv4 unicast autonomous-system 65515", "af-interface GigabitEthernet1/0/3"]
+    lines:
+      - "no passive-interface"
+  - description: "Configure SNMP community"
+    lines:
+      - "snmp-server community KEVTECHOPS69ASZBX RO"

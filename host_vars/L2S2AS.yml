@@ -1,0 +1,59 @@
+---
+interfaces:
+  - name: Port-channel1
+    description: "to ASL2SW3 Portchannel"
+    mode: trunk
+    native_vlan: 999
+  - name: FastEthernet0/1
+    description: "to ASL3SW2"
+    mode: trunk
+    native_vlan: 999
+  - name: FastEthernet0/2
+    description: "to ASL3SW1"
+    mode: trunk
+    native_vlan: 999
+  - name: FastEthernet0/3
+    description: "to ASL2SW3 Portchannel"
+    mode: trunk
+    native_vlan: 999
+    channel_group: 1
+    channel_mode: active
+  - name: FastEthernet0/4
+    description: "to ASL2SW3 Portchannel"
+    mode: trunk
+    native_vlan: 999
+    channel_group: 1
+    channel_mode: active
+  - name: Vlan10
+    description: "Management VLAN"
+    ip: 10.47.192.4
+    mask: 255.255.255.0
+
+misc_config:
+  - description: "Configure default gateway"
+    lines:
+      - "ip default-gateway 10.47.192.254"
+  - description: "VLANS"
+    lines:
+      - "vlan 10"
+      - "name Management"
+      - "vlan 15"
+      - "name Wireless"
+      - "vlan 20"
+      - "name HR"
+      - "vlan 30"
+      - "name Finance"
+      - "vlan 40"
+      - "name Executives"
+      - "vlan 50"
+      - "name Users"
+      - "vlan 60"
+      - "name Guests"
+      - "vlan 70"
+      - "name Voice"
+      - "vlan 80"
+      - "name Servers"
+  - description: "Hostname and routing"
+    lines:
+      - "hostname L2S2AS"
+      - "ip routing"
