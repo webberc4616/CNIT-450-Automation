@@ -15,12 +15,20 @@ interfaces:
     tunnel_source: GigabitEthernet0/0/0
     tunnel_destination: 10.47.176.18
     tunnel_protection: ipsec profile GRE-IPSEC-PROFILE
+  - name: lo0
+    ip: 10.47.145.5
+    mask: 255.255.255.255
  
 misc_config:
   - description: "Hostname and routing"
     lines:
       - "hostname R4EU"
       - "ip routing"
+  - description: "Configure SSH and local authentication"
+    lines:
+        - "ip domain-name kevtechops.net"
+        - "username admin privilege 15 secret 'Pa$$w0rd'"
+        - "crypto key generate rsa modulus 2048"
   - description: "Configure ISAKMP policy"
     parents: ["crypto isakmp policy 10"]
     lines:
@@ -43,8 +51,11 @@ misc_config:
     parents: ["router eigrp KevOpsAS", "address-family ipv4 unicast autonomous-system 65512"]
     lines:
       - "eigrp router-id 10.47.145.5"
+      - "network 10.47.176.0 0.0.0.3"
       - "network 10.47.144.12 0.0.0.3"
       - "network 10.47.176.16 0.0.0.3"
+      - "network 10.47.145.5 0.0.0.0"
+      - "network 10.47.178.0 0.0.0.3"
   - description: "EIGRP default af-interface passive"
     parents: ["router eigrp KevOpsAS", "address-family ipv4 unicast autonomous-system 65512", "af-interface default"]
     lines:
@@ -61,3 +72,6 @@ misc_config:
     parents: ["router eigrp KevOpsAS", "address-family ipv4 unicast autonomous-system 65512", "af-interface Tunnel0"]
     lines:
       - "no passive-interface"
+  - description: "Configure SNMP community"
+    lines:
+      - "snmp-server community KEVTECHOPS69NAZBX RO"
