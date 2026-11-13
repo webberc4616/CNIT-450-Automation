@@ -57,7 +57,6 @@ misc_config:
   - description: "Configure default gateway"
     lines:
       - "ip default-gateway 10.47.160.1"
-  
   - description: "Configure SNMP community"
     lines:
       - "snmp-server community KEVTECHOPS69EUZBX RO"
