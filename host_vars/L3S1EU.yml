@@ -173,7 +173,7 @@ misc_config:
   - description: "Configure SSH and local authentication"
     lines:
         - "ip domain-name kevtechops.net"
-        - "username admin privilege 15 secret 'Pa$$w0rd'"
+        - "username eu_admin privilege 15 secret eu_secret"
         - "crypto key generate rsa modulus 2048"
         - "ip ssh version 2"
   - description: "Configure VTY lines for SSH"
@@ -185,9 +185,7 @@ misc_config:
     parents: ["line con 0"]
     lines:
         - "login local"
-  - description: "Configure SNMP community"
-    lines:
-      - "snmp-server community KEVTECHOPS69EUZBX RO"
+
   - description: "EIGRP AF base"
     parents: ["router eigrp KevOpsAS", "address-family ipv4 unicast autonomous-system 65512"]
     lines:
@@ -203,6 +201,7 @@ misc_config:
       - "network 10.47.142.0 0.0.1.255"
       - "network 10.47.144.0 0.0.0.3"
       - "network 10.47.144.8 0.0.0.3"
+      - "network 10.47.145.3 0.0.0.0"
   - description: "EIGRP default af-interface passive"
     parents: ["router eigrp KevOpsAS", "address-family ipv4 unicast autonomous-system 65512", "af-interface default"]
     lines:
@@ -222,4 +221,4 @@ misc_config:
       - "no passive-interface"
   - description: "Configure SNMP community"
     lines:
-      - "snmp-server community KEVTECHOPS69NAZBX RO"
+      - "snmp-server community KEVTECHOPS69EUZBX RO"

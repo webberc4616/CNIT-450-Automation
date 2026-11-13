@@ -1,0 +1,63 @@
+---
+interfaces:
+  - name: GigabitEthernet1/0/1
+    description: "to EUR1"
+    mode: trunk
+  - name: Vlan10
+    ip: 10.47.160.2
+    mask: 255.255.254.0
+
+misc_config:
+  - description: "VLANS"
+    lines:
+      - "vlan 10"
+      - "name Management"
+      - "vlan 15"
+      - "name Wireless"
+      - "vlan 20"
+      - "name HR"
+      - "vlan 30"
+      - "name Finance"
+      - "vlan 40"
+      - "name Executives"
+      - "vlan 50"
+      - "name Users"
+      - "vlan 60"
+      - "name Guests"
+      - "vlan 70"
+      - "name Voice"
+      - "vlan 80"
+      - "name Servers"
+  - description: "Hostname and routing"
+    lines:
+      - "hostname EU_SOSW"
+  - description: "Configure SSH and local authentication"
+    lines:
+        - "ip domain-name kevtechops.net"
+        - "Username eu_admin privilege 15 secret eu_secret"
+        - "crypto key generate rsa modulus 2048"
+        - "ip ssh version 2"
+  - description: "Configure VTY lines for SSH"
+    parents: ["line vty 0 15"]
+    lines:
+        - "transport input ssh"
+        - "login local"
+  - description: "Configure console login"
+    parents: ["line con 0"]
+    lines:
+        - "login local"
+  - description: "Configure logging and timestamps"
+    lines:
+      - "logging host 10.47.78.108"
+      - "logging trap informational"
+      - "logging source-interface vlan 10"
+      - "service timestamps log datetime msec localtime show-timezone"
+      - "service sequence-numbers"
+      - "logging origin-id hostname"
+  - description: "Configure default gateway"
+    lines:
+      - "ip default-gateway 10.47.160.1"
+  
+  - description: "Configure SNMP community"
+    lines:
+      - "snmp-server community KEVTECHOPS69EUZBX RO"
