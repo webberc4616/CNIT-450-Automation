@@ -14,9 +14,9 @@
       cisco.ios.ios_config:
         parents: "interface {{ item.name }}"
         lines:
-          - "tunnel source {{ item.tunnel_source }}"
-          - "tunnel destination {{ item.tunnel_destination }}"
-          - "tunnel protection ipsec profile {{ item.tunnel_protection }}"
+          - "tunnel_source {{ item.tunnel_source }}"
+          - "tunnel_destination {{ item.tunnel_destination }}"
+          - "tunnel_protection ipsec profile {{ item.tunnel_protection }}"
       loop: "{{ interfaces }}"
       when:
         - interfaces is defined
