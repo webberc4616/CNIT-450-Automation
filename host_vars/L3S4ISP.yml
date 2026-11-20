@@ -1,0 +1,113 @@
+---
+enable_ipv6_routing: true
+
+interfaces:
+  - name: GigabitEthernet1/0/1
+    description: "to ISP1"
+    no_switchport: true
+    ip: 10.47.16.2
+    mask: 255.255.255.252
+  - name: GigabitEthernet1/0/2
+    description: "to ISP2"
+    ip: 10.47.16.22
+    mask: 255.255.255.252
+    no_switchport: true
+  - name: GigabitEthernet1/0/3
+    description: "to ISP3"
+    no_switchport: true
+    ip: 10.47.16.5
+    mask: 255.255.255.252
+  - name: GigabitEthernet1/0/5
+    description: "to EUR1"
+    ip: 10.47.180.5
+    mask: 255.255.255.252
+    no_switchport: true
+  - name: GigabitEthernet1/0/6
+    description: "to AUR1"
+    no_switchport: true
+    ip: 10.48.52.5
+    mask: 255.255.255.252
+  - name: Lo0
+    description: "Loopback Interface"
+    ip: 10.47.17.4
+    mask: 255.255.255.255
+
+
+misc_config:
+  - description: "Hostname and routing"
+    lines:
+      - "hostname S4ISP"
+      - "ip routing"
+  - description: "Configure SSH and local authentication"
+    lines:
+        - "ip domain-name kevtechops.net"
+        - "Username isp_admin privilege 15 secret isp_secret"
+        - "crypto key generate rsa modulus 2048"
+        - "ip ssh version 2"
+  - description: "Configure VTY lines for SSH"
+    parents: ["line vty 0 15"]
+    lines:
+        - "transport input ssh"
+        - "login local"
+  - description: "Configure console login"
+    parents: ["line con 0"]
+    lines:
+        - "login local"
+  - description: "Configure logging and timestamps"
+    lines:
+      - "logging host 10.47.78.108"
+      - "logging trap informational"
+      - "logging source-interface vlan 10"
+      - "service timestamps log datetime msec localtime show-timezone"
+      - "service sequence-numbers"
+      - "logging origin-id hostname"
+  - description: "Configure OSPFv3 process"
+    parents: ["router ospfv3 64512"]
+    lines:
+      - "router-id 10.47.17.4"
+  - description: "Configure OSPFv3 IPv4 address family"
+    parents: ["router ospfv3 64512", "address-family ipv4 unicast"]
+    lines:
+      - "passive-interface Loopback0"
+  - description: "Configure OSPFv3 on Interfaces"
+    parents: ["interface GigabitEthernet1/0/1-3"]
+    lines:
+      - "ipv6 enable"
+      - "ospfv3 network point-to-point"
+      - "ospfv3 64512 ipv4 area 0"
+      - "ospfv3 64512 ipv6 area 0"
+  - description: "Configure OSPFv3 on Loopback Interface"
+    parents: ["interface Loopback0"]
+    lines:
+      - "ipv6 enable"
+      - "ospfv3 network point-to-point"
+      - "ospfv3 64512 ipv4 area 0"
+      - "ospfv3 64512 ipv6 area 0"
+  - description: "Configure BGP process and neighbors"
+    parents: ["router bgp 64512"]
+    lines:
+      - "bgp router-id 10.47.17.4"
+      - "neighbor 10.47.17.1 description to ISP 1"
+      - "neighbor 10.47.17.1 remote-as 64512"
+      - "neighbor 10.47.17.1 update-source Loopback0"
+      - "neighbor 10.47.17.1 next-hop-self"
+      - "neighbor 10.47.17.2 description to ISP 2"
+      - "neighbor 10.47.17.2 remote-as 64512"
+      - "neighbor 10.47.17.2 update-source Loopback0"
+      - "neighbor 10.47.17.2 next-hop-self"
+      - "neighbor 10.47.17.3 description to ISP 3"
+      - "neighbor 10.47.17.3 remote-as 64512"
+      - "neighbor 10.47.17.3 update-source Loopback0"
+      - "neighbor 10.47.17.3 next-hop-self"
+      - "neighbor 10.47.180.6 description to EUR1"
+      - "neighbor 10.47.180.6 remote-as 65512"
+      - "neighbor 10.47.80.6 next-hop-self"
+      - "neighbor 10.47.180.6 default-originate"
+      - "neighbor 10.47.52.6 description to AUR1"
+      - "neighbor 10.47.52.6 remote-as 65520"
+      - "neighbor 10.47.52.6 next-hop-self"
+      - "neighbor 10.47.52.6 default-originate"
+
+  - description: "Configure SNMP community"
+    lines:
+      - "snmp-server community KEVTECHOPS69ISPZBX RO"
